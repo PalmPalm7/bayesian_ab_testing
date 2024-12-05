@@ -1,23 +1,39 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
+import BayesianDashboard from './components/BayesianDashboard';
+import DailyDashboard from './components/DailyDashboard';
 
 function App() {
+  const [activeView, setActiveView] = useState('daily');
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="p-4 bg-gray-100 border-b">
+        <div className="max-w-4xl mx-auto flex gap-4">
+          <button 
+            onClick={() => setActiveView('daily')}
+            className={`px-4 py-2 rounded ${
+              activeView === 'daily' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white hover:bg-gray-100'
+            }`}
+          >
+            Daily Analysis
+          </button>
+          <button 
+            onClick={() => setActiveView('hourly')}
+            className={`px-4 py-2 rounded ${
+              activeView === 'hourly' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white hover:bg-gray-100'
+            }`}
+          >
+            Hourly Analysis
+          </button>
+        </div>
+      </div>
+      
+      {activeView === 'daily' ? <DailyDashboard /> : <BayesianDashboard />}
     </div>
   );
 }
