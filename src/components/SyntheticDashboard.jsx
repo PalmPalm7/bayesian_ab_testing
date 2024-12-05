@@ -1,109 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import Papa from 'papaparse';
 
-const BayesianDashboard = () => {
-  const [data, setData] = useState([]);
+const SyntheticDashboard = () => {
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [selectedHour, setSelectedHour] = useState(10);
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
-  useEffect(() => {
-    fetch('/marketing_data_sample.csv')
-      .then(response => response.text())
-      .then(csvData => {
-        const results = Papa.parse(csvData, { 
-          header: true, 
-          dynamicTyping: true,
-          transform: (value, field) => {
-            if (field === 'converted') return value.toUpperCase() === 'TRUE';
-            return value;
-          }
-        });
-        setData(results.data);
-      })
-      .catch(error => console.error('Error loading data:', error));
-  }, []);
-
-  const bayesianAnalysis = (filteredData) => {
-    if (!filteredData || filteredData.length === 0) return null;
-
-    // Separate into groups
-    const adData = filteredData.filter(row => row['test group'] === 'ad');
-    const psaData = filteredData.filter(row => row['test group'] === 'psa');
-
-    // Calculate successes and trials
-    const adSuccesses = adData.filter(row => row.converted).length;
-    const adTrials = adData.length;
-    const psaSuccesses = psaData.filter(row => row.converted).length;
-    const psaTrials = psaData.length;
-
-    // Beta distribution parameters (with prior alpha=1, beta=1)
-    const adAlpha = 1 + adSuccesses;
-    const adBeta = 1 + (adTrials - adSuccesses);
-    const psaAlpha = 1 + psaSuccesses;
-    const psaBeta = 1 + (psaTrials - psaSuccesses);
-
-    // Generate points for the distribution curves
+  // Simulated data generation (replace with your actual data processing)
+  const generatePosteriorData = (day, hour) => {
+    // This is a simplified version - replace with your actual Bayesian calculation
+    const adMean = 0.15 + Math.random() * 0.05;
+    const psaMean = 0.12 + Math.random() * 0.05;
+    
+    // Generate distribution points
     const points = Array.from({ length: 100 }, (_, i) => {
       const x = i / 100;
-      // Beta distribution approximation
-      const adDensity = Math.pow(x, adAlpha - 1) * Math.pow(1 - x, adBeta - 1);
-      const psaDensity = Math.pow(x, psaAlpha - 1) * Math.pow(1 - x, psaBeta - 1);
-      
       return {
         conversionRate: x,
-        adDensity: adDensity / Math.max(adDensity, psaDensity) * 0.8,
-        psaDensity: psaDensity / Math.max(adDensity, psaDensity) * 0.8
+        adDensity: Math.exp(-Math.pow((x - adMean) * 20, 2)),
+        psaDensity: Math.exp(-Math.pow((x - psaMean) * 20, 2))
       };
     });
-
-    // Calculate means for credible intervals
-    const adMean = adAlpha / (adAlpha + adBeta);
-    const psaMean = psaAlpha / (psaAlpha + psaBeta);
-
-    // Simple approximation of credible intervals
-    const adCI = [
-      Math.max(0, adMean - 1.96 * Math.sqrt(adMean * (1 - adMean) / adTrials)),
-      Math.min(1, adMean + 1.96 * Math.sqrt(adMean * (1 - adMean) / adTrials))
-    ];
-    
-    const psaCI = [
-      Math.max(0, psaMean - 1.96 * Math.sqrt(psaMean * (1 - psaMean) / psaTrials)),
-      Math.min(1, psaMean + 1.96 * Math.sqrt(psaMean * (1 - psaMean) / psaTrials))
-    ];
 
     return {
       posteriorData: points,
       statistics: {
-        adCredibleInterval: adCI,
-        psaCredibleInterval: psaCI,
-        probAdBetter: adMean > psaMean ? 
-          (1 - Math.exp(-Math.abs(adMean - psaMean) * 10)) : 
-          Math.exp(-Math.abs(adMean - psaMean) * 10),
-        adTrials,
-        psaTrials,
-        adSuccesses,
-        psaSuccesses
+        adCredibleInterval: [adMean - 0.02, adMean + 0.02],
+        psaCredibleInterval: [psaMean - 0.02, psaMean + 0.02],
+        probAdBetter: adMean > psaMean ? 0.8 + Math.random() * 0.2 : 0.2 + Math.random() * 0.2
       }
     };
   };
 
-  const analysisResult = React.useMemo(() => {
-    if (data.length === 0) return null;
-    
-    const filteredData = data.filter(
-      row => row['most ads day'] === selectedDay && 
-            row['most ads hour'] === selectedHour
-    );
-    
-    return bayesianAnalysis(filteredData);
-  }, [data, selectedDay, selectedHour]);
-
-  if (!analysisResult) return <div>Loading...</div>;
+  const analysisResult = useMemo(() => 
+    generatePosteriorData(selectedDay, selectedHour),
+    [selectedDay, selectedHour]
+  );
 
   return (
     <div className="w-full max-w-4xl p-4 mx-auto space-y-4">
@@ -177,18 +112,12 @@ const BayesianDashboard = () => {
                 {(analysisResult.statistics.adCredibleInterval[0] * 100).toFixed(1)}% - 
                 {(analysisResult.statistics.adCredibleInterval[1] * 100).toFixed(1)}%
               </p>
-              <p className="text-sm text-gray-600 mt-1">
-                ({analysisResult.statistics.adSuccesses} / {analysisResult.statistics.adTrials} conversions)
-              </p>
             </div>
             <div className="p-4 border rounded">
               <h3 className="font-semibold mb-2">PSA Group (95% CI)</h3>
               <p>
                 {(analysisResult.statistics.psaCredibleInterval[0] * 100).toFixed(1)}% - 
                 {(analysisResult.statistics.psaCredibleInterval[1] * 100).toFixed(1)}%
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                ({analysisResult.statistics.psaSuccesses} / {analysisResult.statistics.psaTrials} conversions)
               </p>
             </div>
           </div>
@@ -203,4 +132,4 @@ const BayesianDashboard = () => {
   );
 };
 
-export default BayesianDashboard;
+export default SyntheticDashboard;

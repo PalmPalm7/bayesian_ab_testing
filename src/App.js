@@ -2,6 +2,7 @@ import './App.css';
 import { useState } from 'react';
 import BayesianDashboard from './components/BayesianDashboard';
 import DailyDashboard from './components/DailyDashboard';
+import SyntheticDashboard from './components/SyntheticDashboard';
 
 function App() {
   const [activeView, setActiveView] = useState('daily');
@@ -30,10 +31,26 @@ function App() {
           >
             Hourly Analysis
           </button>
+          <button 
+            onClick={() => setActiveView('synthetic')}
+            className={`px-4 py-2 rounded ${
+              activeView === 'synthetic' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white hover:bg-gray-100'
+            }`}
+          >
+            Synthetic Analysis
+          </button>
         </div>
       </div>
       
-      {activeView === 'daily' ? <DailyDashboard /> : <BayesianDashboard />}
+      {activeView === 'daily' ? (
+        <DailyDashboard />
+      ) : activeView === 'hourly' ? (
+        <BayesianDashboard />
+      ) : (
+        <SyntheticDashboard />
+      )}
     </div>
   );
 }
