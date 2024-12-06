@@ -21,7 +21,7 @@ function App() {
           >
             Daily Analysis
           </button>
-          <button 
+          {/* <button 
             onClick={() => setActiveView('hourly')}
             className={`px-4 py-2 rounded ${
               activeView === 'hourly' 
@@ -30,7 +30,7 @@ function App() {
             }`}
           >
             Hourly Analysis
-          </button>
+          </button> */}
           <button 
             onClick={() => setActiveView('synthetic')}
             className={`px-4 py-2 rounded ${
@@ -39,15 +39,20 @@ function App() {
                 : 'bg-white hover:bg-gray-100'
             }`}
           >
-            Synthetic Analysis
+            Hourly Analysis
           </button>
         </div>
       </div>
       
-      {activeView === 'daily' ? (
+      {/* {activeView === 'daily' ? (
         <DailyDashboard />
       ) : activeView === 'hourly' ? (
         <BayesianDashboard />
+      ) : (
+        <SyntheticDashboard />
+      )} */}
+      {activeView === 'daily' ? (
+        <DailyDashboard />
       ) : (
         <SyntheticDashboard />
       )}
