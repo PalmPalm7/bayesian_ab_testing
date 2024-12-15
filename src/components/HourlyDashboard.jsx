@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Papa from 'papaparse';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card'; // Assume these are your custom UI components
+import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { jStat } from 'jstat';
 
-// Define available days and hours
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const hours = Array.from({ length: 24 }, (_, i) => i);
 
-const SAMPLE_SIZE = 10000; // number of posterior samples
+const SAMPLE_SIZE = 10000;
 
 function HourlyDashboard() {
   const [data, setData] = useState([]);
@@ -16,7 +15,6 @@ function HourlyDashboard() {
   const [selectedHour, setSelectedHour] = useState(10);
   const [loading, setLoading] = useState(true);
 
-  // Load CSV data on mount
   useEffect(() => {
     Papa.parse('/marketing_data_sample.csv', {
       download: true,
@@ -24,12 +22,10 @@ function HourlyDashboard() {
       dynamicTyping: false,
       complete: (results) => {
         const parsedData = results.data.map((row) => {
-          // Convert 'converted' to boolean (or 1/0)
           const convertedValue = (row['converted'] || '').toUpperCase() === 'TRUE' ? 1 : 0;
           return {
             ...row,
             converted: convertedValue,
-            // Ensure hours are integers
             'most ads hour': parseInt(row['most ads hour'], 10)
           };
         });
@@ -42,10 +38,8 @@ function HourlyDashboard() {
   const analysisResult = useMemo(() => {
     if (data.length === 0) return null;
 
-    // Filter data by selected day and hour
     const filtered = data.filter(d => d['most ads day'] === selectedDay && d['most ads hour'] === selectedHour);
 
-    // Separate test groups
     const adGroup = filtered.filter(d => d['test group'] === 'ad');
     const psaGroup = filtered.filter(d => d['test group'] === 'psa');
 
@@ -54,22 +48,29 @@ function HourlyDashboard() {
     const psaSuccesses = psaGroup.reduce((acc, row) => acc + row.converted, 0);
     const psaTrials = psaGroup.length;
 
+    // Calculate summary statistics
+    const summary = {
+      adTotal: adTrials,
+      adConversions: adSuccesses,
+      adRate: ((adSuccesses / adTrials) * 100).toFixed(2),
+      psaTotal: psaTrials,
+      psaConversions: psaSuccesses,
+      psaRate: ((psaSuccesses / psaTrials) * 100).toFixed(2)
+    };
+
     // Beta(1,1) priors
     const alpha_prior = 1;
     const beta_prior = 1;
 
-    // Posterior parameters
     const ad_alpha_post = alpha_prior + adSuccesses;
     const ad_beta_post = beta_prior + (adTrials - adSuccesses);
 
     const psa_alpha_post = alpha_prior + psaSuccesses;
     const psa_beta_post = beta_prior + (psaTrials - psaSuccesses);
 
-    // Sample from Beta distributions
     const adPosterior = Array.from({length: SAMPLE_SIZE}, () => jStat.beta.sample(ad_alpha_post, ad_beta_post));
     const psaPosterior = Array.from({length: SAMPLE_SIZE}, () => jStat.beta.sample(psa_alpha_post, psa_beta_post));
 
-    // Credible intervals
     const quantile = (arr, q) => {
       const sorted = arr.slice().sort((a,b) => a-b);
       const pos = (sorted.length - 1) * q;
@@ -85,15 +86,12 @@ function HourlyDashboard() {
     const adCredibleInterval = [quantile(adPosterior, 0.025), quantile(adPosterior, 0.975)];
     const psaCredibleInterval = [quantile(psaPosterior, 0.025), quantile(psaPosterior, 0.975)];
 
-    // Probability ad better
     let countAdBetter = 0;
     for (let i = 0; i < SAMPLE_SIZE; i++) {
       if (adPosterior[i] > psaPosterior[i]) countAdBetter++;
     }
     const probAdBetter = countAdBetter / SAMPLE_SIZE;
 
-    // For visualization, we can bin the posterior distributions
-    // We'll create a histogram-like density for plotting
     const bins = 50;
     const createHistogram = (samples) => {
       const sorted = samples.slice().sort((a,b)=>a-b);
@@ -116,8 +114,6 @@ function HourlyDashboard() {
     const adHist = createHistogram(adPosterior);
     const psaHist = createHistogram(psaPosterior);
 
-    // Merge histograms for plotting
-    // We'll assume both hist have same length and aligned bins
     const combinedData = adHist.map((bin, idx) => ({
       conversionRate: bin.conversionRate,
       adDensity: bin.density,
@@ -130,7 +126,8 @@ function HourlyDashboard() {
         adCredibleInterval,
         psaCredibleInterval,
         probAdBetter
-      }
+      },
+      summary
     };
 
   }, [data, selectedDay, selectedHour]);
@@ -172,6 +169,21 @@ function HourlyDashboard() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="p-4 border rounded">
+              <h3 className="font-semibold mb-2">Ad Group Summary</h3>
+              <p>Total Users: {analysisResult.summary.adTotal}</p>
+              <p>Conversions: {analysisResult.summary.adConversions}</p>
+              <p>Raw Rate: {analysisResult.summary.adRate}%</p>
+            </div>
+            <div className="p-4 border rounded">
+              <h3 className="font-semibold mb-2">PSA Group Summary</h3>
+              <p>Total Users: {analysisResult.summary.psaTotal}</p>
+              <p>Conversions: {analysisResult.summary.psaConversions}</p>
+              <p>Raw Rate: {analysisResult.summary.psaRate}%</p>
+            </div>
           </div>
 
           <div className="h-64 mb-4">
