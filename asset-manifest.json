@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/bayesian_ab_testing/static/css/main.54859434.css",
+    "main.js": "/bayesian_ab_testing/static/js/main.1ff1aa02.js",
+    "static/js/453.fbe3e621.chunk.js": "/bayesian_ab_testing/static/js/453.fbe3e621.chunk.js",
+    "index.html": "/bayesian_ab_testing/index.html",
+    "main.54859434.css.map": "/bayesian_ab_testing/static/css/main.54859434.css.map",
+    "main.1ff1aa02.js.map": "/bayesian_ab_testing/static/js/main.1ff1aa02.js.map",
+    "453.fbe3e621.chunk.js.map": "/bayesian_ab_testing/static/js/453.fbe3e621.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.54859434.css",
+    "static/js/main.1ff1aa02.js"
+  ]
+}
