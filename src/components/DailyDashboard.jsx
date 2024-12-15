@@ -8,7 +8,7 @@ const DailyDashboard = () => {
   const [selectedDay, setSelectedDay] = useState('Monday');
 
   useEffect(() => {
-    fetch(`${process.env.PUBLIC_URL}/marketing_data_sample.csv`)  // SIMPLER PATH
+    fetch(`${process.env.PUBLIC_URL}/marketing_data_sample.csv`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
