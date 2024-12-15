@@ -1,4 +1,5 @@
 # Bayesian AB Testing
+Checkout the [live demo](https://palmpalm7.github.io/bayesian_ab_testing/).
 
 ## Repository Breakdowns
 This repository is the final project for MA 578 Bayesian A/B Testing. The project aims to demonstrate the powerful techniques via using Bayesian Inference on A/B Testing, instead of the frequentist approach.
@@ -73,8 +74,12 @@ const probAdBetter = countAdBetter / SAMPLE_SIZE;
 ```
 In other words, for each pair of samples (adPosterior[i], psaPosterior[i]), it checks if adPosterior[i] > psaPosterior[i]. If this happens most of the time, it means that the Ad variant likely has a higher true conversion rate than the PSA variant, given the data and priors.
 
+For further explanation, please refer to [DailyAnalysisDashboard.jsx](https://github.com/PalmPalm7/bayesian_ab_testing/blob/main/src/components/DailyAnalysisDashboard.jsx)
+
 ### Hourly Analysis Dashboard
 
 At last, there is a hourly analysis dashboard that utilizes the logic similar to the daily analysis dashboard.
 
 <img src="img/Hourly_Analysis.png" alt="Hourly Analysis" width="600"/>
+
+For further explanation, please refer to [HourlyAnalysisDashboard.jsx](https://github.com/PalmPalm7/bayesian_ab_testing/blob/main/src/components/HourlyDashboard.jsx)
