@@ -10,7 +10,7 @@ const hours = Array.from({ length: 24 }, (_, i) => i);
 
 const SAMPLE_SIZE = 10000; // number of posterior samples
 
-function SyntheticDashboard() {
+function HourlyDashboard() {
   const [data, setData] = useState([]);
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [selectedHour, setSelectedHour] = useState(10);
@@ -237,4 +237,4 @@ function SyntheticDashboard() {
   );
 }
 
-export default SyntheticDashboard;
+export default HourlyDashboard;
