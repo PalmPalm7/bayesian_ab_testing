@@ -8,8 +8,16 @@ const DailyDashboard = () => {
   const [selectedDay, setSelectedDay] = useState('Monday');
 
   useEffect(() => {
+    // Change this fetch call
     fetch(`${process.env.PUBLIC_URL}/marketing_data_sample.csv`)
-      .then(response => response.text())
+    // To this:
+    fetch(`${process.env.PUBLIC_URL}/bayesian_ab_testing/marketing_data_sample.csv`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
       .then(csvData => {
         const results = Papa.parse(csvData, { 
           header: true, 
@@ -21,7 +29,10 @@ const DailyDashboard = () => {
         });
         setData(results.data);
       })
-      .catch(error => console.error('Error loading data:', error));
+      .catch(error => {
+        console.error('Error loading data:', error);
+        setData([]); // Set empty data on error
+      });
   }, []);
   
   const bayesianAnalysis = (filteredData) => {
