@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "https://palmpalm7.github.io/bayesian_ab_testing/static/css/main.54859434.css",
-    "main.js": "https://palmpalm7.github.io/bayesian_ab_testing/static/js/main.6d48cd2f.js",
+    "main.js": "https://palmpalm7.github.io/bayesian_ab_testing/static/js/main.a5ac2e23.js",
     "static/js/453.fbe3e621.chunk.js": "https://palmpalm7.github.io/bayesian_ab_testing/static/js/453.fbe3e621.chunk.js",
     "index.html": "https://palmpalm7.github.io/bayesian_ab_testing/index.html",
     "main.54859434.css.map": "https://palmpalm7.github.io/bayesian_ab_testing/static/css/main.54859434.css.map",
-    "main.6d48cd2f.js.map": "https://palmpalm7.github.io/bayesian_ab_testing/static/js/main.6d48cd2f.js.map",
+    "main.a5ac2e23.js.map": "https://palmpalm7.github.io/bayesian_ab_testing/static/js/main.a5ac2e23.js.map",
     "453.fbe3e621.chunk.js.map": "https://palmpalm7.github.io/bayesian_ab_testing/static/js/453.fbe3e621.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.54859434.css",
-    "static/js/main.6d48cd2f.js"
+    "static/js/main.a5ac2e23.js"
   ]
 }
