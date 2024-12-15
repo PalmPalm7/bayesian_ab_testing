@@ -31,45 +31,50 @@ To use for Bayesian A/B testing, please refer to the three specific dashboards.
 
 The daily analysis dashboard is a summary of the whole dataset, with a visualization on the conversion rate and count of the advertisement impression per day.
 
-The logic is self explanatory, for further explanation, please refer to:
-https://github.com/PalmPalm7/bayesian_ab_testing/blob/main/src/components/DailyDashboard.jsx
+<img src="img/Daily_Dashboard.png" alt="Daily Dashboard" width="600"/>
 
-Daily Analysis Dashboard
+The logic is self explanatory, for further explanation, please refer to [DailyDashboard.jsx](https://github.com/PalmPalm7/bayesian_ab_testing/blob/main/src/components/DailyDashboard.jsx)
+
+### Daily Analysis Dashboard
 
 This will be the main tool you will use to determine the effectiveness of the two groups.
+
+<img src="img/Daily_Analysis.png" alt="Daily Analysis" width="600"/>
 
 The "Probability Ad Better than PSA" section calculates the fraction of posterior samples where the Ad group's sampled conversion rate is higher than the PSA group's sampled conversion rate. This fraction represents the Bayesian posterior probability that the Ad variant is better than the PSA variant, given the data and the chosen priors.
 
 The posterior distribution is obtained by using a  Beta distribution to model the conversion rate. Given some data (number of conversions and trials in each group), we update the prior Beta distributions for both groups to get posterior distributions. These posterior distributions reflect our updated beliefs about the true conversion rates after seeing the data.
 
 For each group (Ad and PSA), the posterior is a Beta distribution determined by: 
-Posterior(p)=Beta(p; α + successes, β + failures)
+
+**Posterior(p) = Beta(p; α + successes, β + failures)**
+
 where α and β typically start at 1 and 1 (a uniform prior), and "successes" and "failures" are derived from the observed conversion data.
 
 In the Javascript code, it is implemented this way:
+```
 const ad_alpha_post = 1 + adSuccesses;
 const ad_beta_post = 1 + (adTrials - adSuccesses);
 const psa_alpha_post = 1 + psaSuccesses;
 const psa_beta_post = 1 + (psaTrials - psaSuccesses);
-
+```
 Then we draw SAMPLE_SIZE = 10,000 random samples from each posterior distribution where each sample represents a plausible "true" conversion rate scenario based on the observed data and the prior.
-
+```
 const adPosterior = Array.from({length: SAMPLE_SIZE}, () => jStat.beta.sample(ad_alpha_post, ad_beta_post));
 const psaPosterior = Array.from({length: SAMPLE_SIZE}, () => jStat.beta.sample(psa_alpha_post, psa_beta_post));
-
+```
 In the end, the posterior comparison is done by estimating the probability that one group is better than the other, once we have arrays of samples from the Ad group’s posterior and the PSA group’s posterior.
-
+```
 let countAdBetter = 0;
 for (let i = 0; i < SAMPLE_SIZE; i++) {
   if (adPosterior[i] > psaPosterior[i]) countAdBetter++;
 }
 const probAdBetter = countAdBetter / SAMPLE_SIZE;
-
+```
 In other words, for each pair of samples (adPosterior[i], psaPosterior[i]), it checks if adPosterior[i] > psaPosterior[i]. If this happens most of the time, it means that the Ad variant likely has a higher true conversion rate than the PSA variant, given the data and priors.
 
-
-
-Hourly Analysis Dashboard
-
+### Hourly Analysis Dashboard
 
 At last, there is a hourly analysis dashboard that utilizes the logic similar to the daily analysis dashboard.
+
+<img src="img/Hourly_Analysis.png" alt="Hourly Analysis" width="600"/>
