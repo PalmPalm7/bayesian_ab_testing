@@ -8,10 +8,7 @@ const DailyDashboard = () => {
   const [selectedDay, setSelectedDay] = useState('Monday');
 
   useEffect(() => {
-    // Change this fetch call
-    fetch(`${process.env.PUBLIC_URL}/marketing_data_sample.csv`)
-    // To this:
-    fetch(`${process.env.PUBLIC_URL}/bayesian_ab_testing/marketing_data_sample.csv`)
+    fetch(`${process.env.PUBLIC_URL}/marketing_data_sample.csv`)  // SIMPLER PATH
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -34,7 +31,7 @@ const DailyDashboard = () => {
         setData([]); // Set empty data on error
       });
   }, []);
-  
+
   const bayesianAnalysis = (filteredData) => {
     if (!filteredData || filteredData.length === 0) return null;
 

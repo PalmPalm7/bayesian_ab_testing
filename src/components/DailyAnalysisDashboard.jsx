@@ -13,7 +13,7 @@ function DailyDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Papa.parse(`${process.env.PUBLIC_URL}/bayesian_ab_testing/marketing_data_sample.csv`, {
+    Papa.parse(`${process.env.PUBLIC_URL}/marketing_data_sample.csv`, {
       download: true,
       header: true,
       dynamicTyping: false,
@@ -34,7 +34,7 @@ function DailyDashboard() {
       },
     });
   }, []);
-  
+
   const analysisResult = useMemo(() => {
     if (data.length === 0) return null;
 
