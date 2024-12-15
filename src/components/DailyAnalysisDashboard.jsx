@@ -13,7 +13,7 @@ function DailyDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Papa.parse('/marketing_data_sample.csv', {
+    Papa.parse(process.env.PUBLIC_URL + '/marketing_data_sample.csv', {
       download: true,
       header: true,
       dynamicTyping: false,
