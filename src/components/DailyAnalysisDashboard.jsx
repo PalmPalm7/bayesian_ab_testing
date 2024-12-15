@@ -5,14 +5,11 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { jStat } from 'jstat';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const hours = Array.from({ length: 24 }, (_, i) => i);
-
 const SAMPLE_SIZE = 10000;
 
-function HourlyDashboard() {
+function DailyDashboard() {
   const [data, setData] = useState([]);
   const [selectedDay, setSelectedDay] = useState('Monday');
-  const [selectedHour, setSelectedHour] = useState(10);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +23,6 @@ function HourlyDashboard() {
           return {
             ...row,
             converted: convertedValue,
-            'most ads hour': parseInt(row['most ads hour'], 10)
           };
         });
         setData(parsedData);
@@ -38,7 +34,8 @@ function HourlyDashboard() {
   const analysisResult = useMemo(() => {
     if (data.length === 0) return null;
 
-    const filtered = data.filter(d => d['most ads day'] === selectedDay && d['most ads hour'] === selectedHour);
+    // Filter data only by the selected day
+    const filtered = data.filter(d => d['most ads day'] === selectedDay);
 
     const adGroup = filtered.filter(d => d['test group'] === 'ad');
     const psaGroup = filtered.filter(d => d['test group'] === 'psa');
@@ -47,6 +44,10 @@ function HourlyDashboard() {
     const adTrials = adGroup.length;
     const psaSuccesses = psaGroup.reduce((acc, row) => acc + row.converted, 0);
     const psaTrials = psaGroup.length;
+
+    if (adTrials === 0 || psaTrials === 0) {
+      return null;
+    }
 
     // Calculate summary statistics
     const summary = {
@@ -114,6 +115,7 @@ function HourlyDashboard() {
     const adHist = createHistogram(adPosterior);
     const psaHist = createHistogram(psaPosterior);
 
+    // Align histograms bin-to-bin
     const combinedData = adHist.map((bin, idx) => ({
       conversionRate: bin.conversionRate,
       adDensity: bin.density,
@@ -130,24 +132,24 @@ function HourlyDashboard() {
       summary
     };
 
-  }, [data, selectedDay, selectedHour]);
+  }, [data, selectedDay]);
 
   if (loading) {
     return <div>Loading data...</div>;
   }
 
   if (!analysisResult) {
-    return <div>No data available for the selected day/hour.</div>;
+    return <div>No data available for the selected day.</div>;
   }
 
   return (
     <div className="w-full max-w-4xl p-4 mx-auto space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Bayesian Analysis Dashboard</CardTitle>
+          <CardTitle>Bayesian Analysis Dashboard (Daily)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-4">
+          <div className="mb-4">
             <select 
               value={selectedDay}
               onChange={(e) => setSelectedDay(e.target.value)}
@@ -155,18 +157,6 @@ function HourlyDashboard() {
             >
               {days.map(day => (
                 <option key={day} value={day}>{day}</option>
-              ))}
-            </select>
-            
-            <select
-              value={selectedHour}
-              onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-              className="p-2 border rounded"
-            >
-              {hours.map(hour => (
-                <option key={hour} value={hour}>
-                  {hour.toString().padStart(2, '0')}:00
-                </option>
               ))}
             </select>
           </div>
@@ -249,4 +239,4 @@ function HourlyDashboard() {
   );
 }
 
-export default HourlyDashboard;
+export default DailyDashboard;
