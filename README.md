@@ -1,15 +1,15 @@
 # Bayesian AB Testing
 Checkout the [live demo](https://palmpalm7.github.io/bayesian_ab_testing/).
 
+If you would like to read our report, please refer to:
+[Final Report](docs/Final_Report_Bayesian_A_B_Testing.pdf)
+
 ## Repository Breakdowns
 This repository is the final project for MA 578 Bayesian A/B Testing. The project aims to demonstrate the powerful techniques via using Bayesian Inference on A/B Testing, instead of the frequentist approach.
 
 The current dataset leverages the Kaggle dataset we used, a marketing dataset consists of two groups: PSA (public service announcement) and AD (advertisement), please refer to [Marketing AB Testing](https://www.kaggle.com/datasets/faviovaz/marketing-ab-testing).
 
 The project has demonstrated frequentist approach's pitfalls on multiple peeking, misinterpreting p-values, and on time-series, sequential tests.
-
-If you would like to read our report, please refer to:
-[Final Report](docs/Final_Report_Bayesian_A_B_Testing.pdf)
 
 This repository consists our demos:
 
